@@ -13,10 +13,8 @@ import { bgBlur } from "theme/css";
 
 import Iconify from "components/iconify";
 
-import Searchbar from "layouts/common/searchbar";
 import { NAV, HEADER } from "layouts/config-layout";
 import AccountPopover from "layouts/common/account-popover";
-import LanguagePopover from "layouts/common/language-popover";
 import NotificationsPopover from "layouts/common/notifications-popover";
 
 // ----------------------------------------------------------------------
@@ -34,12 +32,12 @@ export default function Header({ onOpenNav }) {
         </IconButton>
       )}
 
-      <Searchbar />
+      {/* <Searchbar /> */}
 
       <Box sx={{ flexGrow: 1 }} />
 
       <Stack direction="row" alignItems="center" spacing={1}>
-        <LanguagePopover />
+        {/* <LanguagePopover /> */}
         <NotificationsPopover />
         <AccountPopover />
       </Stack>

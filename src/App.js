@@ -1,6 +1,5 @@
 import { useScrollToTop } from "hooks/use-scroll-to-top";
-import DashboardLayout from "layouts";
-import { Route, Routes } from "react-router-dom";
+import AdminRouter from "routes/AdminRouter";
 import ThemeProvider from "theme";
 
 function App() {
@@ -8,9 +7,7 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Routes>
-        <Route path="*" element={<DashboardLayout />} />
-      </Routes>
+      <AdminRouter />
     </ThemeProvider>
   );
 }

@@ -4,20 +4,18 @@ import PropTypes from "prop-types";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Drawer from "@mui/material/Drawer";
-import Button from "@mui/material/Button";
-import Avatar from "@mui/material/Avatar";
 import { alpha } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import ListItemButton from "@mui/material/ListItemButton";
 
-import { RouterLink } from "components/router-link";
+import { RouterLink } from "routes/components";
 import { useResponsive } from "hooks/use-responsive";
 
 import Logo from "components/logo";
 import Scrollbar from "components/scrollbar";
 
 import { NAV } from "layouts/config-layout";
-import navConfig from "layouts/config-navigation";
+import menu from "menu";
 import { useLocation } from "react-router-dom";
 
 // ----------------------------------------------------------------------
@@ -51,7 +49,7 @@ export default function Nav({ openNav, onCloseNav }) {
         <Typography variant="subtitle2">{"유저명"}</Typography>
 
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {"유저 역할"}
+          {"Role"}
         </Typography>
       </Box>
     </Box>
@@ -59,9 +57,9 @@ export default function Nav({ openNav, onCloseNav }) {
 
   const renderMenu = (
     <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {navConfig.map((item) => (
-        <NavItem key={item.title} item={item} />
-      ))}
+      {Object.entries(menu).map(([key, value]) => {
+        return <NavItem key={key} item={value} />;
+      })}
     </Stack>
   );
 

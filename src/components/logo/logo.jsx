@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import { useTheme } from "@mui/material/styles";
 
-import { RouterLink } from "components/router-link";
+import { RouterLink } from "routes/components";
 
 // ----------------------------------------------------------------------
 
