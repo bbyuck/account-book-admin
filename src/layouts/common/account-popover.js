@@ -7,6 +7,10 @@ import { alpha } from "@mui/material/styles";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
+import { useDispatch } from "react-redux";
+import { openConfirm } from "store/slice/clientInfo";
+import api from "api";
+import { removeJWT } from "util/authUtil";
 
 // ----------------------------------------------------------------------
 
@@ -28,6 +32,7 @@ const MENU_OPTIONS = [
 // ----------------------------------------------------------------------
 
 export default function AccountPopover() {
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(null);
 
   const handleOpen = (event) => {
@@ -36,6 +41,40 @@ export default function AccountPopover() {
 
   const handleClose = () => {
     setOpen(null);
+  };
+
+  const openLogoutConfirm = () => {
+    dispatch(
+      openConfirm({
+        open: true,
+        title: "로그아웃 하시겠습니까?",
+        message: "",
+        confirmLabel: "확인",
+        cancelLabel: "취소",
+        onConfirmed: () => {
+          logout();
+          return true;
+        },
+      })
+    );
+  };
+
+  const logout = () => {
+    api
+      .post("/api/v1/logout")
+      .then((response) => {
+        if (response.data.data.success) {
+          removeJWT();
+          sessionStorage.setItem("logout", true);
+          sessionStorage.setItem("logoutMessage", response.data.message);
+          window.location.replace(`${process.env.PUBLIC_URL}/login`);
+        }
+      })
+      .catch((error) => {
+        /**
+         * Nothing to do
+         */
+      });
   };
 
   return (
@@ -90,7 +129,7 @@ export default function AccountPopover() {
         <MenuItem
           disableRipple
           disableTouchRipple
-          onClick={handleClose}
+          onClick={openLogoutConfirm}
           sx={{ typography: "body2", color: "error.main", py: 1.5 }}
         >
           Logout

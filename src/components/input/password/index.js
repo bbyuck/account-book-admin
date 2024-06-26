@@ -7,6 +7,7 @@ export default function PasswordInput({
   password,
   setPassword,
   passwordLabel,
+  action,
 }) {
   return (
     <TextField
@@ -21,6 +22,11 @@ export default function PasswordInput({
           return;
         }
         setPassword(e.target.value);
+      }}
+      onKeyUp={(e) => {
+        if (e.code === "Enter" && action) {
+          action();
+        }
       }}
     />
   );

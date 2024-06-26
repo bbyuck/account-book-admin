@@ -1,5 +1,5 @@
-import { Suspense, lazy } from "react";
-import { Outlet, Navigate, useRoutes } from "react-router-dom";
+import { Suspense, lazy, useEffect, useState } from "react";
+import { Outlet, Navigate, useRoutes, useNavigate } from "react-router-dom";
 
 import DashboardLayout from "layouts";
 
@@ -7,11 +7,18 @@ import LoginPage from "pages/login";
 import NotFoundPage from "pages/not-found";
 import menu from "menu";
 import { Box, CircularProgress } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { setPageTransition } from "store/slice/clientInfo";
 
 // ----------------------------------------------------------------------
 
 export default function AdminRouter() {
-  const routes = useRoutes([
+  const { loggedIn, check } = useSelector((state) => state.authInfo);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const authenticatedRoutes = [
     {
       path: "/",
       element: (
@@ -35,19 +42,48 @@ export default function AdminRouter() {
         };
       }),
     },
+  ];
+  const unAuthenticatedRoutes = [
     {
       path: "login",
       element: <LoginPage />,
     },
+  ];
+  const commonRoutes = [
     {
-      path: "404",
+      path: "notfound",
       element: <NotFoundPage />,
     },
     {
       path: "*",
-      element: <Navigate to="/404" replace />,
+      element: <Navigate to="/notfound" replace />,
     },
-  ]);
+  ];
 
-  return routes;
+  const [routes, setRoutes] = useState(commonRoutes);
+
+  useEffect(() => {
+    if (loggedIn) {
+      setRoutes(authenticatedRoutes.concat(commonRoutes));
+    } else {
+      setRoutes(unAuthenticatedRoutes.concat(commonRoutes));
+    }
+  }, [loggedIn]);
+
+  useEffect(() => {
+    if (!loggedIn) {
+      dispatch(setPageTransition("switch"));
+      navigate("/login", {
+        replace: true,
+      });
+    } else if (loggedIn) {
+      dispatch(setPageTransition("switch"));
+      navigate("/", {
+        replace: true,
+      });
+    }
+  }, [check]);
+
+  const router = useRoutes(routes);
+  return router;
 }

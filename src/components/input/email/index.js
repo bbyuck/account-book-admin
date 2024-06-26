@@ -7,6 +7,7 @@ export default function EmailInput({
   setEmail,
   emailLabel,
   eamilInputRef,
+  action,
 }) {
   return (
     <TextField
@@ -21,6 +22,11 @@ export default function EmailInput({
           return;
         }
         setEmail(e.target.value);
+      }}
+      onKeyUp={(e) => {
+        if (e.code === "Enter" && action) {
+          action();
+        }
       }}
     />
   );

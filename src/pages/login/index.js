@@ -2,7 +2,6 @@ import {
   Box,
   Button,
   Card,
-  Container,
   FormControlLabel,
   Link,
   Stack,
@@ -137,6 +136,7 @@ export default function Login() {
               email={email}
               setEmail={setEmail}
               emailLabel={"이메일"}
+              action={login}
             />
           </AppInputBox>
           <AppInputBox>
@@ -144,6 +144,7 @@ export default function Login() {
               password={password}
               setPassword={setPassword}
               passwordLabel={"비밀번호"}
+              action={login}
             />
           </AppInputBox>
 
