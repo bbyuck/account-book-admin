@@ -7,7 +7,7 @@ import { alpha } from "@mui/material/styles";
 import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { openConfirm } from "store/slice/clientInfo";
 import api from "api";
 import { removeJWT } from "util/authUtil";
@@ -18,14 +18,23 @@ const MENU_OPTIONS = [
   {
     label: "Home",
     icon: "eva:home-fill",
+    action: () => {
+      alert("준비중입니다.");
+    },
   },
   {
     label: "Profile",
     icon: "eva:person-fill",
+    action: () => {
+      alert("준비중입니다.");
+    },
   },
   {
     label: "Settings",
     icon: "eva:settings-2-fill",
+    action: () => {
+      alert("준비중입니다.");
+    },
   },
 ];
 
@@ -34,6 +43,8 @@ const MENU_OPTIONS = [
 export default function AccountPopover() {
   const dispatch = useDispatch();
   const [open, setOpen] = useState(null);
+
+  const { loginEmail } = useSelector((state) => state.authInfo);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -109,17 +120,17 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {"유저명"}
+            {"관리자"}
           </Typography>
           <Typography variant="body2" sx={{ color: "text.secondary" }} noWrap>
-            {"유저email"}
+            {loginEmail}
           </Typography>
         </Box>
 
         <Divider sx={{ borderStyle: "dashed" }} />
 
         {MENU_OPTIONS.map((option) => (
-          <MenuItem key={option.label} onClick={handleClose}>
+          <MenuItem key={option.label} onClick={option.action}>
             {option.label}
           </MenuItem>
         ))}

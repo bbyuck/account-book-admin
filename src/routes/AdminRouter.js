@@ -38,7 +38,7 @@ export default function AdminRouter() {
         const Page = lazy(() => import(`pages/${value.srcPath}`));
         return {
           path: value.path,
-          element: <Page />,
+          element: <Page title={value.title} />,
         };
       }),
     },

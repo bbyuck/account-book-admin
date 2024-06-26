@@ -30,6 +30,8 @@ import { resetLedgerStore } from "store/slice/ledgerInfo";
 import { resetUserStore } from "store/slice/userInfo";
 import { bgGradient } from "theme/css";
 import { alpha, useTheme } from "@mui/material/styles";
+import { setEamil } from "store/slice/userInfo";
+import { setLoginEmail } from "store/slice/authInfo";
 
 const AntSwitch = styled(Switch)(({ theme }) => ({
   width: 28,
@@ -97,9 +99,11 @@ export default function Login() {
     };
 
     http
-      .post("/api/v1/authenticate", params)
+      .post("/api/admin/v1/authenticate", params)
       .then((response) => {
-        saveJWT(response.data.data);
+        const responseData = response.data.data;
+        saveJWT(responseData.token);
+        dispatch(setLoginEmail(responseData.email));
         dispatch(syncAuth());
       })
       .catch((error) => {

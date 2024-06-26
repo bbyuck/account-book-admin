@@ -17,11 +17,13 @@ import Scrollbar from "components/scrollbar";
 import { NAV } from "layouts/config-layout";
 import menu from "menu";
 import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // ----------------------------------------------------------------------
 
 export default function Nav({ openNav, onCloseNav }) {
   const { pathname } = useLocation();
+  const { loginEmail } = useSelector((state) => state.authInfo);
 
   const upLg = useResponsive("up", "lg");
 
@@ -46,10 +48,10 @@ export default function Nav({ openNav, onCloseNav }) {
       }}
     >
       <Box sx={{ ml: 2 }}>
-        <Typography variant="subtitle2">{"유저명"}</Typography>
+        <Typography variant="subtitle2">{"관리자"}</Typography>
 
         <Typography variant="body2" sx={{ color: "text.secondary" }}>
-          {"Role"}
+          {loginEmail}
         </Typography>
       </Box>
     </Box>

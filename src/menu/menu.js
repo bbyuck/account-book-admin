@@ -16,9 +16,9 @@ const data = {
     icon: icon("ic_analytics"),
     srcPath: "test",
   },
-  user: {
-    title: "사용자 관리",
-    path: "/user",
+  "sample-user": {
+    title: "사용자 관리 샘플",
+    path: "/user/sample",
     icon: icon("ic_user"),
     srcPath: "sample-user",
   },
@@ -33,6 +33,12 @@ const data = {
     path: "/blog",
     icon: icon("ic_blog"),
     srcPath: "test",
+  },
+  user: {
+    title: "사용자 관리",
+    path: "/user",
+    icon: icon("ic_user"),
+    srcPath: "user",
   },
 };
 

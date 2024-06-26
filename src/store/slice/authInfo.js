@@ -4,6 +4,7 @@ import { haveAccessToken } from "util/authUtil";
 const initialState = {
   loggedIn: haveAccessToken(),
   check: 0,
+  loginEmail: "",
 };
 
 const authInfoSlice = createSlice({
@@ -15,8 +16,12 @@ const authInfoSlice = createSlice({
       state.loggedIn = haveAccessToken();
       state.check = state.check + 1;
     },
+    setLoginEmail(state = initialState, action) {
+      state.loginEmail = action.payload;
+    },
   },
 });
 
-export const { syncAuth, resetAuthStore } = authInfoSlice.actions;
+export const { syncAuth, resetAuthStore, setLoginEmail } =
+  authInfoSlice.actions;
 export default authInfoSlice.reducer;
