@@ -1,87 +1,184 @@
-import { useState } from "react";
-
-import Box from "@mui/material/Box";
-import Link from "@mui/material/Link";
-import Card from "@mui/material/Card";
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import LoadingButton from "@mui/lab/LoadingButton";
-import { alpha, useTheme } from "@mui/material/styles";
-import InputAdornment from "@mui/material/InputAdornment";
-
-import { useRouter } from "routes/hooks";
-
+import {
+  Box,
+  Button,
+  Card,
+  Container,
+  FormControlLabel,
+  Link,
+  Stack,
+  Switch,
+  styled,
+} from "@mui/material";
+import "pages/login/style.css";
+import http from "api";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import {
+  openErrorAlert,
+  openSuccessAlert,
+  resetClientStore,
+  setPageTransition,
+} from "store/slice/clientInfo";
+import { saveJWT } from "util/authUtil";
+import { resetAuthStore, syncAuth } from "store/slice/authInfo";
+import { useNavigate } from "react-router-dom";
+import AppInputForm from "components/input/form";
+import AppInputBox from "components/input/inputbox";
+import Subject from "./subject";
+import PasswordInput from "components/input/password";
+import EmailInput from "components/input/email";
+import { resetLedgerStore } from "store/slice/ledgerInfo";
+import { resetUserStore } from "store/slice/userInfo";
 import { bgGradient } from "theme/css";
+import { alpha, useTheme } from "@mui/material/styles";
 
-import Logo from "components/logo";
-import Iconify from "components/iconify";
+const AntSwitch = styled(Switch)(({ theme }) => ({
+  width: 28,
+  height: 16,
+  padding: 0,
+  display: "flex",
+  "&:active": {
+    "& .MuiSwitch-thumb": {
+      width: 15,
+    },
+    "& .MuiSwitch-switchBase.Mui-checked": {
+      transform: "translateX(9px)",
+    },
+  },
+  "& .MuiSwitch-switchBase": {
+    padding: 2,
+    "&.Mui-checked": {
+      transform: "translateX(12px)",
+      color: "#fff",
+      "& + .MuiSwitch-track": {
+        opacity: 1,
+        backgroundColor: theme.palette.mode === "dark" ? "#177ddc" : "#1890ff",
+      },
+    },
+  },
+  "& .MuiSwitch-thumb": {
+    boxShadow: "0 2px 4px 0 rgb(0 35 11 / 20%)",
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    transition: theme.transitions.create(["width"], {
+      duration: 200,
+    }),
+  },
+  "& .MuiSwitch-track": {
+    borderRadius: 16 / 2,
+    opacity: 1,
+    backgroundColor:
+      theme.palette.mode === "dark"
+        ? "rgba(255,255,255,.35)"
+        : "rgba(0,0,0,.25)",
+    boxSizing: "border-box",
+  },
+}));
 
-// ----------------------------------------------------------------------
-
-export default function LoginPage() {
+export default function Login() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [autoLogin, setAutoLogin] = useState(false);
   const theme = useTheme();
 
-  const router = useRouter();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const [showPassword, setShowPassword] = useState(false);
-
-  const handleClick = () => {
-    router.push("/dashboard");
+  const toSignUp = () => {
+    dispatch(setPageTransition("push"));
+    navigate("/signup");
   };
 
-  const renderForm = (
-    <>
-      <Stack spacing={3}>
-        <TextField name="email" label="Email address" />
+  const login = () => {
+    const params = {
+      email: email,
+      password: password,
+      autoLogin: autoLogin,
+    };
 
-        <TextField
-          name="password"
-          label="Password"
-          type={showPassword ? "text" : "password"}
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={() => setShowPassword(!showPassword)}
-                  edge="end"
-                >
-                  <Iconify
-                    icon={showPassword ? "eva:eye-fill" : "eva:eye-off-fill"}
-                  />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+    http
+      .post("/api/v1/authenticate", params)
+      .then((response) => {
+        saveJWT(response.data.data);
+        dispatch(syncAuth());
+      })
+      .catch((error) => {
+        console.log(error);
+        dispatch(openErrorAlert(error.response.data.message));
+      });
+  };
+
+  useEffect(() => {
+    const logout = sessionStorage.getItem("logout");
+    if (logout) {
+      const logoutMessage = sessionStorage.getItem("logoutMessage");
+      dispatch(resetAuthStore());
+      dispatch(resetLedgerStore());
+      dispatch(resetUserStore());
+      dispatch(resetClientStore());
+
+      if (logoutMessage) {
+        dispatch(openSuccessAlert(logoutMessage));
+        sessionStorage.removeItem("logoutMessage");
+      }
+
+      sessionStorage.removeItem("logout");
+    }
+  }, []);
+
+  const renderForm = () => {
+    return (
+      <Stack className="login-page-wrapper">
+        <Subject value={"Login"} />
+        <AppInputForm>
+          <AppInputBox>
+            <EmailInput
+              email={email}
+              setEmail={setEmail}
+              emailLabel={"이메일"}
+            />
+          </AppInputBox>
+          <AppInputBox>
+            <PasswordInput
+              password={password}
+              setPassword={setPassword}
+              passwordLabel={"비밀번호"}
+            />
+          </AppInputBox>
+
+          <div className="signup-prompt">
+            아직 계정이 없으신가요?&nbsp;&nbsp;
+            <Link onClick={toSignUp} className={"anchor-button"}>
+              Sign up
+            </Link>
+          </div>
+
+          <AppInputBox>
+            <Button
+              fullWidth
+              variant="contained"
+              size={"large"}
+              onClick={login}
+            >
+              Login in
+            </Button>
+          </AppInputBox>
+
+          <FormControlLabel
+            control={
+              <AntSwitch
+                checked={autoLogin}
+                onChange={(e) => setAutoLogin(e.target.checked)}
+                sx={{ m: 1 }}
+              />
+            }
+            label="remeber me"
+          />
+        </AppInputForm>
       </Stack>
-
-      <Stack
-        direction="row"
-        alignItems="center"
-        justifyContent="flex-end"
-        sx={{ my: 3 }}
-      >
-        <Link variant="subtitle2" underline="hover">
-          Forgot password?
-        </Link>
-      </Stack>
-
-      <LoadingButton
-        fullWidth
-        size="large"
-        type="submit"
-        variant="contained"
-        color="inherit"
-        onClick={handleClick}
-      >
-        Login
-      </LoadingButton>
-    </>
-  );
+    );
+  };
 
   return (
     <Box
@@ -93,70 +190,15 @@ export default function LoginPage() {
         height: 1,
       }}
     >
-      <Logo
-        sx={{
-          position: "fixed",
-          top: { xs: 16, md: 24 },
-          left: { xs: 16, md: 24 },
-        }}
-      />
-
       <Stack alignItems="center" justifyContent="center" sx={{ height: 1 }}>
         <Card
           sx={{
-            p: 5,
+            p: 10,
             width: 1,
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
-
-          <Typography variant="body2" sx={{ mt: 2, mb: 5 }}>
-            Don’t have an account?
-            <Link variant="subtitle2" sx={{ ml: 0.5 }}>
-              Get started
-            </Link>
-          </Typography>
-
-          <Stack direction="row" spacing={2}>
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:google-fill" color="#DF3E30" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:facebook-fill" color="#1877F2" />
-            </Button>
-
-            <Button
-              fullWidth
-              size="large"
-              color="inherit"
-              variant="outlined"
-              sx={{ borderColor: alpha(theme.palette.grey[500], 0.16) }}
-            >
-              <Iconify icon="eva:twitter-fill" color="#1C9CEA" />
-            </Button>
-          </Stack>
-
-          <Divider sx={{ my: 3 }}>
-            <Typography variant="body2" sx={{ color: "text.secondary" }}>
-              OR
-            </Typography>
-          </Divider>
-
-          {renderForm}
+          {renderForm()}
         </Card>
       </Stack>
     </Box>
